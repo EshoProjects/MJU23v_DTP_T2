@@ -73,6 +73,34 @@ namespace MJU23v_DTP_T2
                 string Link = Console.ReadLine();
                 return new Link(Category, Group, Name, Descr, Link);
             }
+
+            public static void RemoveLinkByIndex(int index)
+            {
+                if (index >= 0 && index < Links.Count)
+                {
+                    Links.RemoveAt(index);
+                }
+                else
+                {
+                    Console.WriteLine("Indexet är utanför gränserna för länklistan.");
+                }
+            }
+
+            public static void HandleRemoveCommand(string[] arg)
+            {
+                if (arg[1] == "bort" && arg.Length == 3)
+                {
+                    int index;
+                    if (int.TryParse(arg[2], out index))
+                    {
+                        RemoveLinkByIndex(index);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Felaktig användning av kommandot 'ta bort'. Använd 'ta bort <index>'.");
+                    }
+                }
+            }
         }
 
         static void Main(string[] args)
@@ -164,14 +192,7 @@ namespace MJU23v_DTP_T2
                 }
                 else if (command == "ta")
                 {
-                    if (arg[1] == "bort" && arg.Length == 3)
-                    {
-                        Links.RemoveAt(Int32.Parse(arg[2]));
-                    }
-                    else
-                    {
-                        Console.WriteLine("Felaktig användning av kommandot 'ta bort'. Använd 'ta bort <index>'.");
-                    }
+                    Link.HandleRemoveCommand(arg);
                 }
                 else if (command == "öppna")
                 {
