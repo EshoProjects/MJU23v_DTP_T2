@@ -170,6 +170,24 @@ namespace MJU23v_DTP_T2
             {
                 Link.DisplayHelp();
             }
+
+            public static void SaveLinksToFile(List<Link> links, string fileName)
+            {
+                try
+                {
+                    using (StreamWriter sw = new StreamWriter(fileName))
+                    {
+                        foreach (Link link in links)
+                        {
+                            sw.WriteLine(link.ToFormattedString());
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error occurred while saving links: {ex.Message}");
+                }
+            }
         }
 
         static void Main(string[] args)
@@ -229,13 +247,7 @@ namespace MJU23v_DTP_T2
                                 fileName = $@"..\..\..\Links\{cmdArgs[0]}";
                             }
 
-                            using (StreamWriter sw = new StreamWriter(fileName))
-                            {
-                                foreach (Link link in Links)
-                                {
-                                    sw.WriteLine(link.ToFormattedString());
-                                }
-                            }
+                            LinkManager.SaveLinksToFile(Links, fileName);
                             break;
 
                         case "ta":
