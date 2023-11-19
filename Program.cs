@@ -133,6 +133,7 @@ namespace MJU23v_DTP_T2
                 Console.WriteLine("ladda <file>    - load links from a specific file");
                 Console.WriteLine("lista           - display the list of links");
                 Console.WriteLine("ny             - create a new link");
+                Console.WriteLine("spara <file>   - save links to a specific file");
                 Console.WriteLine("---------------------------------------------------------------");
             }
         }
