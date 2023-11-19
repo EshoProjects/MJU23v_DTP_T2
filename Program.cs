@@ -57,6 +57,22 @@ namespace MJU23v_DTP_T2
                     }
                 }
             }
+
+            public static Link CreateNewLink()
+            {
+                Console.WriteLine("Skapa en ny länk:");
+                Console.Write("  ange kategori: ");
+                string Category = Console.ReadLine();
+                Console.Write("  ange grupp: ");
+                string Group = Console.ReadLine();
+                Console.Write("  ange namn: ");
+                string Name = Console.ReadLine();
+                Console.Write("  ange beskrivning: ");
+                string Descr = Console.ReadLine();
+                Console.Write("  ange länk: ");
+                string Link = Console.ReadLine();
+                return new Link(Category, Group, Name, Descr, Link);
+            }
         }
 
         static void Main(string[] args)
@@ -128,18 +144,7 @@ namespace MJU23v_DTP_T2
                 }
                 else if (command == "ny")
                 {
-                    Console.WriteLine("Skapa en ny länk:");
-                    Console.Write("  ange kategori: ");
-                    string Category = Console.ReadLine();
-                    Console.Write("  ange grupp: ");
-                    string Group = Console.ReadLine();
-                    Console.Write("  ange namn: ");
-                    string Name = Console.ReadLine();
-                    Console.Write("  ange beskrivning: ");
-                    string Descr = Console.ReadLine();
-                    Console.Write("  ange länk: ");
-                    string Link = Console.ReadLine();
-                    Link newLink = new Link(Category, Group, Name, Descr, Link);
+                    Link newLink = Link.CreateNewLink();
                     Links.Add(newLink);
                 }
                 else if (command == "spara")
