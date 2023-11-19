@@ -136,6 +136,7 @@ namespace MJU23v_DTP_T2
                 Console.WriteLine("spara <file>   - save links to a specific file");
                 Console.WriteLine("ta bort <index> - remove a link by index");
                 Console.WriteLine("öppna grupp <group> - open all links in a specific group");
+                Console.WriteLine("öppna länk <index> - open a link by index");
                 Console.WriteLine("---------------------------------------------------------------");
             }
         }
