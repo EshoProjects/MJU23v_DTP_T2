@@ -44,7 +44,14 @@ namespace MJU23v_DTP_T2
 
             public void OpenLinkInDefaultBrowser()
             {
-                Process.Start(new ProcessStartInfo { FileName = Url, UseShellExecute = true });
+                try
+                {
+                    Process.Start(new ProcessStartInfo { FileName = Url, UseShellExecute = true });
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error occurred while trying to open the link: {ex.Message}");
+                }
             }
 
             public string ToFormattedString()
@@ -279,6 +286,10 @@ namespace MJU23v_DTP_T2
                                     {
                                         Console.WriteLine("Incorrect usage of the 'öppna länk' command. Use 'öppna länk <index>'.");
                                     }
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Incorrect usage of the 'öppna' command. Use 'öppna grupp <gruppnamn>' or 'öppna länk <index>'.");
                                 }
                             }
                             else
