@@ -109,6 +109,8 @@ namespace MJU23v_DTP_T2
                 }
                 else if (command == "lista")
                 {
+                    Console.WriteLine("|Index|Category  |Group     |Name                |Description                              |");
+                    Console.WriteLine("---------------------------------------------------------------");
                     int i = 0;
                     foreach (Link L in Links)
                         L.DisplayLinkInfo(i++);
@@ -157,39 +159,44 @@ namespace MJU23v_DTP_T2
                 }
                 else if (command == "öppna")
                 {
-                    if (arg.Length == 3)
+                    switch (arg.Length)
                     {
-                        if (arg[1] == "grupp")
-                        {
-                            foreach (Link L in Links)
+                        case 3:
+                            if (arg[1] == "grupp")
                             {
-                                if (L.Group == arg[2])
+                                foreach (Link L in Links)
                                 {
-                                    L.OpenLinkInDefaultBrowser();
+                                    if (L.Group == arg[2])
+                                    {
+                                        L.OpenLinkInDefaultBrowser();
+                                    }
                                 }
                             }
-                        }
-                        else if (arg[1] == "länk")
-                        {
-                            int ix = Int32.Parse(arg[2]);
-                            if (ix >= 0 && ix < Links.Count)
+                            else if (arg[1] == "länk")
                             {
-                                Links[ix].OpenLinkInDefaultBrowser();
+                                int ix;
+                                if (int.TryParse(arg[2], out ix))
+                                {
+                                    if (ix >= 0 && ix < Links.Count)
+                                    {
+                                        Links[ix].OpenLinkInDefaultBrowser();
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Indexet är utanför gränserna för länklistan.");
+                                    }
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Felaktig användning av kommandot 'öppna länk'. Använd 'öppna länk <index>'.");
+                                }
                             }
-                            else
-                            {
-                                Console.WriteLine("Indexet är utanför gränserna för länklistan.");
-                            }
-                        }
+                            break;
+
+                        default:
+                            Console.WriteLine("Felaktig användning av kommandot 'öppna'. Använd 'öppna grupp <gruppnamn>' eller 'öppna länk <index>'.");
+                            break;
                     }
-                    else
-                    {
-                        Console.WriteLine("Felaktig användning av kommandot 'öppna'. Använd 'öppna grupp <gruppnamn>' eller 'öppna länk <index>'.");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine($"Okänt kommando: '{command}'");
                 }
             } while (true);
         }
