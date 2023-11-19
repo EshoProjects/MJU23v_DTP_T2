@@ -46,6 +46,17 @@ namespace MJU23v_DTP_T2
             {
                 return $"{Category}|{Group}|{Name}|{Descr}|{Link}";
             }
+
+            public void OpenLinkByGroup(string groupName)
+            {
+                foreach (Link L in Links)
+                {
+                    if (L.Group == groupName)
+                    {
+                        L.OpenLinkInDefaultBrowser();
+                    }
+                }
+            }
         }
 
         static void Main(string[] args)
@@ -164,13 +175,7 @@ namespace MJU23v_DTP_T2
                         case 3:
                             if (arg[1] == "grupp")
                             {
-                                foreach (Link L in Links)
-                                {
-                                    if (L.Group == arg[2])
-                                    {
-                                        L.OpenLinkInDefaultBrowser();
-                                    }
-                                }
+                                Links[0].OpenLinkByGroup(arg[2]);
                             }
                             else if (arg[1] == "länk")
                             {
