@@ -101,6 +101,24 @@ namespace MJU23v_DTP_T2
                     }
                 }
             }
+
+            public static void LoadLinksFromFile(string fileName)
+            {
+                Links = new List<Link>();
+
+                using (StreamReader sr = new StreamReader(fileName))
+                {
+                    int i = 0;
+                    string line = sr.ReadLine();
+                    while (line != null)
+                    {
+                        Console.WriteLine(line);
+                        Link L = new Link(line);
+                        Links.Add(L);
+                        line = sr.ReadLine();
+                    }
+                }
+            }
         }
 
         static void Main(string[] args)
@@ -147,20 +165,7 @@ namespace MJU23v_DTP_T2
                         fileName = $@"..\..\..\Links\{arg[1]}";
                     }
 
-                    Links = new List<Link>();
-
-                    using (StreamReader sr = new StreamReader(fileName))
-                    {
-                        int i = 0;
-                        string line = sr.ReadLine();
-                        while (line != null)
-                        {
-                            Console.WriteLine(line);
-                            Link L = new Link(line);
-                            Links.Add(L);
-                            line = sr.ReadLine();
-                        }
-                    }
+                    Link.LoadLinksFromFile(fileName);
                 }
                 else if (command == "lista")
                 {
