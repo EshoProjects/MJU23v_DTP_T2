@@ -144,7 +144,7 @@ namespace MJU23v_DTP_T2
         static void Main(string[] args)
         {
             string fileName = @"..\..\..\Links\Links.lis";
-
+            //Fixme linkmanager
             LinkManager.LoadLinksFromFile(Links, fileName);
 
             Console.WriteLine("Welcome to the link list! Type 'hjälp' for help.");
