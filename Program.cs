@@ -88,9 +88,31 @@ namespace MJU23v_DTP_T2
                 string name = Console.ReadLine();
                 Console.Write("  Enter description: ");
                 string description = Console.ReadLine();
-                Console.Write("  Enter URL: ");
-                string url = Console.ReadLine();
+                string url = GetValidUrl(); // Use the helper function to get a valid URL
                 return new Link(category, group, name, description, url);
+            }
+
+            private static string GetValidUrl()
+            {
+                string url;
+                do
+                {
+                    Console.Write("  Enter URL: ");
+                    url = Console.ReadLine();
+
+                    if (!IsValidUrl(url))
+                    {
+                        Console.WriteLine("Invalid URL. Please enter a valid URL.");
+                    }
+
+                } while (!IsValidUrl(url));
+
+                return url;
+            }
+
+            private static bool IsValidUrl(string url)
+            {
+                return Uri.TryCreate(url, UriKind.Absolute, out _);
             }
 
             public static void RemoveLinkByIndex(List<Link> links, int index)
