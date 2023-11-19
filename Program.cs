@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 
 namespace MJU23v_DTP_T2
 {
@@ -61,10 +62,23 @@ namespace MJU23v_DTP_T2
                     }
                 }
             }
-        }
 
-        static class LinkManager
-        {
+            public static Link CreateNewLink()
+            {
+                Console.WriteLine("Create a new link:");
+                Console.Write("  Enter category: ");
+                string category = Console.ReadLine();
+                Console.Write("  Enter group: ");
+                string group = Console.ReadLine();
+                Console.Write("  Enter name: ");
+                string name = Console.ReadLine();
+                Console.Write("  Enter description: ");
+                string description = Console.ReadLine();
+                Console.Write("  Enter URL: ");
+                string url = Console.ReadLine();
+                return new Link(category, group, name, description, url);
+            }
+
             public static void RemoveLinkByIndex(List<Link> links, int index)
             {
                 if (index >= 0 && index < links.Count)
@@ -77,37 +91,29 @@ namespace MJU23v_DTP_T2
                 }
             }
 
-            public static void HandleRemoveCommand(List<Link> links, string[] args)
-            {
-                if (args[1] == "bort" && args.Length == 3)
-                {
-                    int index;
-                    if (int.TryParse(args[2], out index))
-                    {
-                        RemoveLinkByIndex(links, index);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Incorrect usage of the 'ta bort' command. Use 'ta bort <index>'.");
-                    }
-                }
-            }
-
             public static void LoadLinksFromFile(List<Link> links, string fileName)
             {
                 links.Clear();
 
-                using (StreamReader sr = new StreamReader(fileName))
+                try
                 {
-                    int i = 0;
-                    string line = sr.ReadLine();
-                    while (line != null)
+                    using (StreamReader sr = new StreamReader(fileName))
                     {
-                        Console.WriteLine(line);
-                        Link link = new Link(line);
-                        links.Add(link);
-                        line = sr.ReadLine();
+                        string line;
+                        while ((line = sr.ReadLine()) != null)
+                        {
+                            Link link = new Link(line);
+                            links.Add(link);
+                        }
                     }
+                }
+                catch (FileNotFoundException)
+                {
+                    Console.WriteLine($"File not found: {fileName}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error occurred while loading links: {ex.Message}");
                 }
             }
 
@@ -128,6 +134,44 @@ namespace MJU23v_DTP_T2
             }
         }
 
+        static class LinkManager
+        {
+            public static void RemoveLinkByIndex(List<Link> links, int index)
+            {
+                Link.RemoveLinkByIndex(links, index);
+            }
+
+            public static void HandleRemoveCommand(List<Link> links, string[] args)
+            {
+                if (args[0] == "ta" && args[1] == "bort" && args.Length == 3)
+                {
+                    int index;
+                    if (int.TryParse(args[2], out index))
+                    {
+                        RemoveLinkByIndex(links, index);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Incorrect usage of the 'ta bort' command. Use 'ta bort <index>'.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Incorrect usage of the 'ta bort' command. Use 'ta bort <index>'.");
+                }
+            }
+
+            public static void LoadLinksFromFile(List<Link> links, string fileName)
+            {
+                Link.LoadLinksFromFile(links, fileName);
+            }
+
+            public static void DisplayHelp()
+            {
+                Link.DisplayHelp();
+            }
+        }
+
         static void Main(string[] args)
         {
             string fileName = @"..\..\..\Links\Links.lis";
@@ -144,7 +188,10 @@ namespace MJU23v_DTP_T2
 
                 if (arguments.Length > 0)
                 {
-                    switch (arguments[0])
+                    string mainCommand = arguments[0];
+                    string[] cmdArgs = arguments.Skip(1).ToArray();  // Skip the main command
+
+                    switch (mainCommand)
                     {
                         case "sluta":
                             Console.WriteLine("Goodbye! Welcome back!");
@@ -155,9 +202,9 @@ namespace MJU23v_DTP_T2
                             break;
 
                         case "ladda":
-                            if (arguments.Length == 2)
+                            if (cmdArgs.Length == 1)
                             {
-                                fileName = $@"..\..\..\Links\{arguments[1]}";
+                                fileName = $@"..\..\..\Links\{cmdArgs[0]}";
                             }
 
                             LinkManager.LoadLinksFromFile(Links, fileName);
@@ -172,14 +219,14 @@ namespace MJU23v_DTP_T2
                             break;
 
                         case "ny":
-                            Link newLink = LinkManager.CreateNewLink();
+                            Link newLink = Link.CreateNewLink();
                             Links.Add(newLink);
                             break;
 
                         case "spara":
-                            if (arguments.Length == 2)
+                            if (cmdArgs.Length == 1)
                             {
-                                fileName = $@"..\..\..\Links\{arguments[1]}";
+                                fileName = $@"..\..\..\Links\{cmdArgs[0]}";
                             }
 
                             using (StreamWriter sw = new StreamWriter(fileName))
@@ -192,20 +239,20 @@ namespace MJU23v_DTP_T2
                             break;
 
                         case "ta":
-                            LinkManager.HandleRemoveCommand(Links, arguments);
+                            LinkManager.HandleRemoveCommand(Links, cmdArgs);
                             break;
 
                         case "öppna":
-                            if (arguments.Length == 3)
+                            if (cmdArgs.Length == 2)
                             {
-                                if (arguments[1] == "grupp")
+                                if (cmdArgs[0] == "grupp")
                                 {
-                                    Links[0].OpenLinkByGroup(arguments[2]);
+                                    Links[0].OpenLinkByGroup(cmdArgs[1]);
                                 }
-                                else if (arguments[1] == "länk")
+                                else if (cmdArgs[0] == "länk")
                                 {
                                     int index;
-                                    if (int.TryParse(arguments[2], out index))
+                                    if (int.TryParse(cmdArgs[1], out index))
                                     {
                                         if (index >= 0 && index < Links.Count)
                                         {
