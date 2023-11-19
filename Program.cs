@@ -1,55 +1,57 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO.Enumeration;
-using System.Net.Http.Headers;
-using System.Xml.Linq;
 
 namespace MJU23v_DTP_T2
 {
     internal class Program
     {
-        static List<Link> links = new List<Link>();
+        static List<Link> Links = new List<Link>();
+
         class Link
         {
-            public string category, group, name, descr, link;
+            public string Category, Group, Name, Descr, Link;
+
             public Link(string category, string group, string name, string descr, string link)
             {
-                this.category = category;
-                this.group = group;
-                this.name = name;
-                this.descr = descr;
-                this.link = link;
+                Category = category;
+                Group = group;
+                Name = name;
+                Descr = descr;
+                Link = link;
             }
 
             public Link(string line)
             {
                 string[] part = line.Split('|');
-                category = part[0];
-                group = part[1];
-                name = part[2];
-                descr = part[3];
-                link = part[4];
+                Category = part[0];
+                Group = part[1];
+                Name = part[2];
+                Descr = part[3];
+                Link = part[4];
             }
-            public void Print(int i)
+
+            public void DisplayLinkInfo(int i)
             {
-                Console.WriteLine($"|{i,-2}|{category,-10}|{group,-10}|{name,-20}|{descr,-40}|");
+                Console.WriteLine($"|{i,-2}|{Category,-10}|{Group,-10}|{Name,-20}|{Descr,-40}|");
             }
-            public void OpenLink()
+
+            public void OpenLinkInDefaultBrowser()
             {
-                Process application = new Process();
-                application.StartInfo.UseShellExecute = true;
-                application.StartInfo.FileName = link;
-                application.Start();
-                // application.WaitForExit();
+                Process.Start(new ProcessStartInfo { FileName = Link, UseShellExecute = true });
             }
-            public string ToString()
+
+            public string ToFormattedString()
             {
-                return $"{category}|{group}|{name}|{descr}|{link}";
+                return $"{Category}|{Group}|{Name}|{Descr}|{Link}";
             }
         }
+
         static void Main(string[] args)
         {
-            string filename = @"..\..\..\links\links.lis";
-            using (StreamReader sr = new StreamReader(filename))
+            string fileName = @"..\..\..\Links\Links.lis";
+
+            using (StreamReader sr = new StreamReader(fileName))
             {
                 int i = 0;
                 string line = sr.ReadLine();
@@ -57,21 +59,25 @@ namespace MJU23v_DTP_T2
                 {
                     Console.WriteLine(line);
                     Link L = new Link(line);
-                    L.Print(i++);
-                    links.Add(L);
+                    L.DisplayLinkInfo(i++);
+                    Links.Add(L);
                     line = sr.ReadLine();
                 }
             }
+
             Console.WriteLine("Välkommen till länklistan! Skriv 'hjälp' för hjälp!");
+
             do
             {
                 Console.Write("> ");
                 string cmd = Console.ReadLine().Trim();
                 string[] arg = cmd.Split();
                 string command = arg[0];
+
                 if (command == "sluta")
                 {
                     Console.WriteLine("Hej då! Välkommen åter!");
+                    break; // Exit the loop to end the program
                 }
                 else if (command == "hjälp")
                 {
@@ -82,10 +88,12 @@ namespace MJU23v_DTP_T2
                 {
                     if (arg.Length == 2)
                     {
-                        filename = $@"..\..\..\links\{arg[1]}";
+                        fileName = $@"..\..\..\Links\{arg[1]}";
                     }
-                    links = new List<Link>();
-                    using (StreamReader sr = new StreamReader(filename))
+
+                    Links = new List<Link>();
+
+                    using (StreamReader sr = new StreamReader(fileName))
                     {
                         int i = 0;
                         string line = sr.ReadLine();
@@ -93,7 +101,7 @@ namespace MJU23v_DTP_T2
                         {
                             Console.WriteLine(line);
                             Link L = new Link(line);
-                            links.Add(L);
+                            Links.Add(L);
                             line = sr.ReadLine();
                         }
                     }
@@ -101,67 +109,86 @@ namespace MJU23v_DTP_T2
                 else if (command == "lista")
                 {
                     int i = 0;
-                    foreach (Link L in links)
-                        L.Print(i++);
+                    foreach (Link L in Links)
+                        L.DisplayLinkInfo(i++);
                 }
                 else if (command == "ny")
                 {
                     Console.WriteLine("Skapa en ny länk:");
                     Console.Write("  ange kategori: ");
-                    string category = Console.ReadLine();
+                    string Category = Console.ReadLine();
                     Console.Write("  ange grupp: ");
-                    string group = Console.ReadLine();
+                    string Group = Console.ReadLine();
                     Console.Write("  ange namn: ");
-                    string name = Console.ReadLine();
+                    string Name = Console.ReadLine();
                     Console.Write("  ange beskrivning: ");
-                    string descr = Console.ReadLine();
+                    string Descr = Console.ReadLine();
                     Console.Write("  ange länk: ");
-                    string link = Console.ReadLine();
-                    Link newLink = new Link(category, group, name, descr, link);
-                    links.Add(newLink);
+                    string Link = Console.ReadLine();
+                    Link newLink = new Link(Category, Group, Name, Descr, Link);
+                    Links.Add(newLink);
                 }
                 else if (command == "spara")
                 {
                     if (arg.Length == 2)
                     {
-                        filename = $@"..\..\..\links\{arg[1]}";
+                        fileName = $@"..\..\..\Links\{arg[1]}";
                     }
-                    using (StreamWriter sr = new StreamWriter(filename))
+
+                    using (StreamWriter sr = new StreamWriter(fileName))
                     {
-                        foreach(Link L in links)
+                        foreach (Link L in Links)
                         {
-                            sr.WriteLine(L.ToString());
+                            sr.WriteLine(L.ToFormattedString());
                         }
                     }
                 }
                 else if (command == "ta")
                 {
-                    if (arg[1] == "bort")
+                    if (arg[1] == "bort" && arg.Length == 3)
                     {
-                        links.RemoveAt(Int32.Parse(arg[2]));
+                        Links.RemoveAt(Int32.Parse(arg[2]));
+                    }
+                    else
+                    {
+                        Console.WriteLine("Felaktig användning av kommandot 'ta bort'. Använd 'ta bort <index>'.");
                     }
                 }
                 else if (command == "öppna")
                 {
-                    if (arg[1] == "grupp")
+                    if (arg.Length == 3)
                     {
-                        foreach (Link L in links)
+                        if (arg[1] == "grupp")
                         {
-                            if (L.group == arg[2])
+                            foreach (Link L in Links)
                             {
-                                L.OpenLink();
+                                if (L.Group == arg[2])
+                                {
+                                    L.OpenLinkInDefaultBrowser();
+                                }
+                            }
+                        }
+                        else if (arg[1] == "länk")
+                        {
+                            int ix = Int32.Parse(arg[2]);
+                            if (ix >= 0 && ix < Links.Count)
+                            {
+                                Links[ix].OpenLinkInDefaultBrowser();
+                            }
+                            else
+                            {
+                                Console.WriteLine("Indexet är utanför gränserna för länklistan.");
                             }
                         }
                     }
-                    else if (arg[1] == "länk")
+                    else
                     {
-                        int ix = Int32.Parse(arg[2]);
-                        links[ix].OpenLink();
+                        Console.WriteLine("Felaktig användning av kommandot 'öppna'. Använd 'öppna grupp <gruppnamn>' eller 'öppna länk <index>'.");
                     }
                 }
                 else
                 {
-                    Console.WriteLine("Okänt kommando: '{command}'");
+                    Console.WriteLine($"Okänt kommando: '{command}'");
                 }
             } while (true);
         }
