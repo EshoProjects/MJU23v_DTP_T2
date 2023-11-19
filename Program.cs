@@ -11,6 +11,7 @@ namespace MJU23v_DTP_T2
 
         class Link
         {
+            //fixme
             public string Category, Group, Name, Descr, Link;
 
             public Link(string category, string group, string name, string descr, string link)
