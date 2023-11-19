@@ -61,23 +61,10 @@ namespace MJU23v_DTP_T2
                     }
                 }
             }
+        }
 
-            public static Link CreateNewLink()
-            {
-                Console.WriteLine("Create a new link:");
-                Console.Write("  Enter category: ");
-                string category = Console.ReadLine();
-                Console.Write("  Enter group: ");
-                string group = Console.ReadLine();
-                Console.Write("  Enter name: ");
-                string name = Console.ReadLine();
-                Console.Write("  Enter description: ");
-                string description = Console.ReadLine();
-                Console.Write("  Enter URL: ");
-                string url = Console.ReadLine();
-                return new Link(category, group, name, description, url);
-            }
-
+        static class LinkManager
+        {
             public static void RemoveLinkByIndex(List<Link> links, int index)
             {
                 if (index >= 0 && index < links.Count)
@@ -144,7 +131,7 @@ namespace MJU23v_DTP_T2
         static void Main(string[] args)
         {
             string fileName = @"..\..\..\Links\Links.lis";
-            //Fixme linkmanager
+
             LinkManager.LoadLinksFromFile(Links, fileName);
 
             Console.WriteLine("Welcome to the link list! Type 'hjälp' for help.");
