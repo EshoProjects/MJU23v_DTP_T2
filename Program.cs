@@ -11,16 +11,19 @@ namespace MJU23v_DTP_T2
 
         class Link
         {
-            //fixme
-            public string Category, Group, Name, Descr, Link;
+            public string Category { get; set; }
+            public string Group { get; set; }
+            public string Name { get; set; }
+            public string Descr { get; set; }
+            public string Url { get; set; }
 
-            public Link(string category, string group, string name, string descr, string link)
+            public Link(string category, string group, string name, string descr, string url)
             {
                 Category = category;
                 Group = group;
                 Name = name;
                 Descr = descr;
-                Link = link;
+                Url = url;
             }
 
             public Link(string line)
@@ -30,82 +33,82 @@ namespace MJU23v_DTP_T2
                 Group = part[1];
                 Name = part[2];
                 Descr = part[3];
-                Link = part[4];
+                Url = part[4];
             }
 
-            public void DisplayLinkInfo(int i)
+            public void DisplayLinkInfo(int index)
             {
-                Console.WriteLine($"|{i,-2}|{Category,-10}|{Group,-10}|{Name,-20}|{Descr,-40}|");
+                Console.WriteLine($"|{index,-2}|{Category,-10}|{Group,-10}|{Name,-20}|{Descr,-40}|");
             }
 
             public void OpenLinkInDefaultBrowser()
             {
-                Process.Start(new ProcessStartInfo { FileName = Link, UseShellExecute = true });
+                Process.Start(new ProcessStartInfo { FileName = Url, UseShellExecute = true });
             }
 
             public string ToFormattedString()
             {
-                return $"{Category}|{Group}|{Name}|{Descr}|{Link}";
+                return $"{Category}|{Group}|{Name}|{Descr}|{Url}";
             }
 
             public void OpenLinkByGroup(string groupName)
             {
-                foreach (Link L in Links)
+                foreach (Link link in Links)
                 {
-                    if (L.Group == groupName)
+                    if (link.Group == groupName)
                     {
-                        L.OpenLinkInDefaultBrowser();
+                        link.OpenLinkInDefaultBrowser();
                     }
                 }
             }
 
             public static Link CreateNewLink()
             {
-                Console.WriteLine("Skapa en ny länk:");
-                Console.Write("  ange kategori: ");
-                string Category = Console.ReadLine();
-                Console.Write("  ange grupp: ");
-                string Group = Console.ReadLine();
-                Console.Write("  ange namn: ");
-                string Name = Console.ReadLine();
-                Console.Write("  ange beskrivning: ");
-                string Descr = Console.ReadLine();
-                Console.Write("  ange länk: ");
-                string Link = Console.ReadLine();
-                return new Link(Category, Group, Name, Descr, Link);
+                Console.WriteLine("Create a new link:");
+                Console.Write("  Enter category: ");
+                string category = Console.ReadLine();
+                Console.Write("  Enter group: ");
+                string group = Console.ReadLine();
+                Console.Write("  Enter name: ");
+                string name = Console.ReadLine();
+                Console.Write("  Enter description: ");
+                string description = Console.ReadLine();
+                Console.Write("  Enter URL: ");
+                string url = Console.ReadLine();
+                return new Link(category, group, name, description, url);
             }
 
-            public static void RemoveLinkByIndex(int index)
+            public static void RemoveLinkByIndex(List<Link> links, int index)
             {
-                if (index >= 0 && index < Links.Count)
+                if (index >= 0 && index < links.Count)
                 {
-                    Links.RemoveAt(index);
+                    links.RemoveAt(index);
                 }
                 else
                 {
-                    Console.WriteLine("Indexet är utanför gränserna för länklistan.");
+                    Console.WriteLine("Index is out of bounds for the link list.");
                 }
             }
 
-            public static void HandleRemoveCommand(string[] arg)
+            public static void HandleRemoveCommand(List<Link> links, string[] args)
             {
-                if (arg[1] == "bort" && arg.Length == 3)
+                if (args[1] == "bort" && args.Length == 3)
                 {
                     int index;
-                    if (int.TryParse(arg[2], out index))
+                    if (int.TryParse(args[2], out index))
                     {
-                        RemoveLinkByIndex(index);
+                        RemoveLinkByIndex(links, index);
                     }
                     else
                     {
-                        Console.WriteLine("Felaktig användning av kommandot 'ta bort'. Använd 'ta bort <index>'.");
+                        Console.WriteLine("Incorrect usage of the 'ta bort' command. Use 'ta bort <index>'.");
                     }
                 }
             }
 
-            public static void LoadLinksFromFile(string fileName)
+            public static void LoadLinksFromFile(List<Link> links, string fileName)
             {
-                Links = new List<Link>();
+                links.Clear();
 
                 using (StreamReader sr = new StreamReader(fileName))
                 {
@@ -114,8 +117,8 @@ namespace MJU23v_DTP_T2
                     while (line != null)
                     {
                         Console.WriteLine(line);
-                        Link L = new Link(line);
-                        Links.Add(L);
+                        Link link = new Link(line);
+                        links.Add(link);
                         line = sr.ReadLine();
                     }
                 }
@@ -123,9 +126,12 @@ namespace MJU23v_DTP_T2
 
             public static void DisplayHelp()
             {
-                Console.WriteLine("hjälp           - skriv ut den här hjälpen");
-                Console.WriteLine("sluta           - avsluta programmet");
-                // Add more help messages as needed
+                Console.WriteLine("Available commands and variants:");
+                Console.WriteLine("---------------------------------------------------------------");
+                Console.WriteLine("hjälp           - display this help");
+                Console.WriteLine("sluta           - exit the program");
+                Console.WriteLine("ladda <file>    - load links from a specific file");
+                Console.WriteLine("---------------------------------------------------------------");
             }
         }
 
@@ -133,111 +139,104 @@ namespace MJU23v_DTP_T2
         {
             string fileName = @"..\..\..\Links\Links.lis";
 
-            using (StreamReader sr = new StreamReader(fileName))
-            {
-                int i = 0;
-                string line = sr.ReadLine();
-                while (line != null)
-                {
-                    Console.WriteLine(line);
-                    Link L = new Link(line);
-                    L.DisplayLinkInfo(i++);
-                    Links.Add(L);
-                    line = sr.ReadLine();
-                }
-            }
+            LinkManager.LoadLinksFromFile(Links, fileName);
 
-            Console.WriteLine("Välkommen till länklistan! Skriv 'hjälp' för hjälp!");
+            Console.WriteLine("Welcome to the link list! Type 'hjälp' for help.");
 
             do
             {
                 Console.Write("> ");
-                string cmd = Console.ReadLine().Trim();
-                string[] arg = cmd.Split();
-                string command = arg[0];
+                string command = Console.ReadLine().Trim();
+                string[] arguments = command.Split();
 
-                if (command == "sluta")
+                if (arguments.Length > 0)
                 {
-                    Console.WriteLine("Hej då! Välkommen åter!");
-                    break; // Exit the loop to end the program
-                }
-                else if (command == "hjälp")
-                {
-                    Link.DisplayHelp();
-                }
-                else if (command == "ladda")
-                {
-                    if (arg.Length == 2)
+                    switch (arguments[0])
                     {
-                        fileName = $@"..\..\..\Links\{arg[1]}";
-                    }
+                        case "sluta":
+                            Console.WriteLine("Goodbye! Welcome back!");
+                            return;
 
-                    Link.LoadLinksFromFile(fileName);
-                }
-                else if (command == "lista")
-                {
-                    Console.WriteLine("|Index|Category  |Group     |Name                |Description                              |");
-                    Console.WriteLine("---------------------------------------------------------------");
-                    int i = 0;
-                    foreach (Link L in Links)
-                        L.DisplayLinkInfo(i++);
-                }
-                else if (command == "ny")
-                {
-                    Link newLink = Link.CreateNewLink();
-                    Links.Add(newLink);
-                }
-                else if (command == "spara")
-                {
-                    if (arg.Length == 2)
-                    {
-                        fileName = $@"..\..\..\Links\{arg[1]}";
-                    }
+                        case "hjälp":
+                            LinkManager.DisplayHelp();
+                            break;
 
-                    using (StreamWriter sr = new StreamWriter(fileName))
-                    {
-                        foreach (Link L in Links)
-                        {
-                            sr.WriteLine(L.ToFormattedString());
-                        }
-                    }
-                }
-                else if (command == "ta")
-                {
-                    Link.HandleRemoveCommand(arg);
-                }
-                else if (command == "öppna")
-                {
-                    switch (arg.Length)
-                    {
-                        case 3:
-                            if (arg[1] == "grupp")
+                        case "ladda":
+                            if (arguments.Length == 2)
                             {
-                                Links[0].OpenLinkByGroup(arg[2]);
+                                fileName = $@"..\..\..\Links\{arguments[1]}";
                             }
-                            else if (arg[1] == "länk")
+
+                            LinkManager.LoadLinksFromFile(Links, fileName);
+                            break;
+
+                        case "lista":
+                            Console.WriteLine("|Index|Category  |Group     |Name                |Description                              |");
+                            Console.WriteLine("---------------------------------------------------------------");
+                            int i = 0;
+                            foreach (Link link in Links)
+                                link.DisplayLinkInfo(i++);
+                            break;
+
+                        case "ny":
+                            Link newLink = LinkManager.CreateNewLink();
+                            Links.Add(newLink);
+                            break;
+
+                        case "spara":
+                            if (arguments.Length == 2)
                             {
-                                int ix;
-                                if (int.TryParse(arg[2], out ix))
+                                fileName = $@"..\..\..\Links\{arguments[1]}";
+                            }
+
+                            using (StreamWriter sw = new StreamWriter(fileName))
+                            {
+                                foreach (Link link in Links)
                                 {
-                                    if (ix >= 0 && ix < Links.Count)
-                                    {
-                                        Links[ix].OpenLinkInDefaultBrowser();
-                                    }
-                                    else
-                                    {
-                                        Console.WriteLine("Indexet är utanför gränserna för länklistan.");
-                                    }
-                                }
-                                else
-                                {
-                                    Console.WriteLine("Felaktig användning av kommandot 'öppna länk'. Använd 'öppna länk <index>'.");
+                                    sw.WriteLine(link.ToFormattedString());
                                 }
                             }
                             break;
 
+                        case "ta":
+                            LinkManager.HandleRemoveCommand(Links, arguments);
+                            break;
+
+                        case "öppna":
+                            if (arguments.Length == 3)
+                            {
+                                if (arguments[1] == "grupp")
+                                {
+                                    Links[0].OpenLinkByGroup(arguments[2]);
+                                }
+                                else if (arguments[1] == "länk")
+                                {
+                                    int index;
+                                    if (int.TryParse(arguments[2], out index))
+                                    {
+                                        if (index >= 0 && index < Links.Count)
+                                        {
+                                            Links[index].OpenLinkInDefaultBrowser();
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine("Index is out of bounds for the link list.");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Incorrect usage of the 'öppna länk' command. Use 'öppna länk <index>'.");
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("Incorrect usage of the 'öppna' command. Use 'öppna grupp <gruppnamn>' or 'öppna länk <index>'.");
+                            }
+                            break;
+
                         default:
-                            Console.WriteLine("Felaktig användning av kommandot 'öppna'. Använd 'öppna grupp <gruppnamn>' eller 'öppna länk <index>'.");
+                            Console.WriteLine("Invalid command. Type 'hjälp' for assistance.");
                             break;
                     }
                 }
