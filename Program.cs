@@ -119,6 +119,13 @@ namespace MJU23v_DTP_T2
                     }
                 }
             }
+
+            public static void DisplayHelp()
+            {
+                Console.WriteLine("hjälp           - skriv ut den här hjälpen");
+                Console.WriteLine("sluta           - avsluta programmet");
+                // Add more help messages as needed
+            }
         }
 
         static void Main(string[] args)
@@ -155,8 +162,7 @@ namespace MJU23v_DTP_T2
                 }
                 else if (command == "hjälp")
                 {
-                    Console.WriteLine("hjälp           - skriv ut den här hjälpen");
-                    Console.WriteLine("sluta           - avsluta programmet");
+                    Link.DisplayHelp();
                 }
                 else if (command == "ladda")
                 {
