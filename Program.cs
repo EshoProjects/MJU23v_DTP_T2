@@ -30,11 +30,18 @@ namespace MJU23v_DTP_T2
             public Link(string line)
             {
                 string[] part = line.Split('|');
-                Category = part[0];
-                Group = part[1];
-                Name = part[2];
-                Descr = part[3];
-                Url = part[4];
+                if (part.Length == 5)
+                {
+                    Category = part[0];
+                    Group = part[1];
+                    Name = part[2];
+                    Descr = part[3];
+                    Url = part[4];
+                }
+                else
+                {
+                    Console.WriteLine("Invalid data format in the file.");
+                }
             }
 
             public void DisplayLinkInfo(int index)
@@ -189,6 +196,7 @@ namespace MJU23v_DTP_T2
                             sw.WriteLine(link.ToFormattedString());
                         }
                     }
+                    Console.WriteLine($"Links saved to {fileName}.");
                 }
                 catch (Exception ex)
                 {
@@ -216,91 +224,98 @@ namespace MJU23v_DTP_T2
                     string mainCommand = arguments[0];
                     string[] cmdArgs = arguments.Skip(1).ToArray();  // Skip the main command
 
-                    switch (mainCommand)
+                    try
                     {
-                        case "sluta":
-                            Console.WriteLine("Goodbye! Welcome back!");
-                            return;
+                        switch (mainCommand)
+                        {
+                            case "sluta":
+                                Console.WriteLine("Goodbye! Welcome back!");
+                                return;
 
-                        case "hjälp":
-                            LinkManager.DisplayHelp();
-                            break;
+                            case "hjälp":
+                                LinkManager.DisplayHelp();
+                                break;
 
-                        case "ladda":
-                            if (cmdArgs.Length == 1)
-                            {
-                                fileName = $@"..\..\..\Links\{cmdArgs[0]}";
-                            }
-
-                            LinkManager.LoadLinksFromFile(Links, fileName);
-                            break;
-
-                        case "lista":
-                            Console.WriteLine("|Index|Category  |Group     |Name                |Description                              |");
-                            Console.WriteLine("---------------------------------------------------------------");
-                            int i = 0;
-                            foreach (Link link in Links)
-                                link.DisplayLinkInfo(i++);
-                            break;
-
-                        case "ny":
-                            Link newLink = Link.CreateNewLink();
-                            Links.Add(newLink);
-                            break;
-
-                        case "spara":
-                            if (cmdArgs.Length == 1)
-                            {
-                                fileName = $@"..\..\..\Links\{cmdArgs[0]}";
-                            }
-
-                            LinkManager.SaveLinksToFile(Links, fileName);
-                            break;
-
-                        case "ta":
-                            LinkManager.HandleRemoveCommand(Links, cmdArgs);
-                            break;
-
-                        case "öppna":
-                            if (cmdArgs.Length == 2)
-                            {
-                                if (cmdArgs[0] == "grupp")
+                            case "ladda":
+                                if (cmdArgs.Length == 1)
                                 {
-                                    Links[0].OpenLinkByGroup(cmdArgs[1]);
+                                    fileName = $@"..\..\..\Links\{cmdArgs[0]}";
                                 }
-                                else if (cmdArgs[0] == "länk")
+
+                                LinkManager.LoadLinksFromFile(Links, fileName);
+                                break;
+
+                            case "lista":
+                                Console.WriteLine("|Index|Category  |Group     |Name                |Description                              |");
+                                Console.WriteLine("---------------------------------------------------------------");
+                                int i = 0;
+                                foreach (Link link in Links)
+                                    link.DisplayLinkInfo(i++);
+                                break;
+
+                            case "ny":
+                                Link newLink = Link.CreateNewLink();
+                                Links.Add(newLink);
+                                break;
+
+                            case "spara":
+                                if (cmdArgs.Length == 1)
                                 {
-                                    int index;
-                                    if (int.TryParse(cmdArgs[1], out index))
+                                    fileName = $@"..\..\..\Links\{cmdArgs[0]}";
+                                }
+
+                                LinkManager.SaveLinksToFile(Links, fileName);
+                                break;
+
+                            case "ta":
+                                LinkManager.HandleRemoveCommand(Links, cmdArgs);
+                                break;
+
+                            case "öppna":
+                                if (cmdArgs.Length == 2)
+                                {
+                                    if (cmdArgs[0] == "grupp")
                                     {
-                                        if (index >= 0 && index < Links.Count)
+                                        Links[0].OpenLinkByGroup(cmdArgs[1]);
+                                    }
+                                    else if (cmdArgs[0] == "länk")
+                                    {
+                                        int index;
+                                        if (int.TryParse(cmdArgs[1], out index))
                                         {
-                                            Links[index].OpenLinkInDefaultBrowser();
+                                            if (index >= 0 && index < Links.Count)
+                                            {
+                                                Links[index].OpenLinkInDefaultBrowser();
+                                            }
+                                            else
+                                            {
+                                                Console.WriteLine("Index is out of bounds for the link list.");
+                                            }
                                         }
                                         else
                                         {
-                                            Console.WriteLine("Index is out of bounds for the link list.");
+                                            Console.WriteLine("Incorrect usage of the 'öppna länk' command. Use 'öppna länk <index>'.");
                                         }
                                     }
                                     else
                                     {
-                                        Console.WriteLine("Incorrect usage of the 'öppna länk' command. Use 'öppna länk <index>'.");
+                                        Console.WriteLine("Incorrect usage of the 'öppna' command. Use 'öppna grupp <gruppnamn>' or 'öppna länk <index>'.");
                                     }
                                 }
                                 else
                                 {
                                     Console.WriteLine("Incorrect usage of the 'öppna' command. Use 'öppna grupp <gruppnamn>' or 'öppna länk <index>'.");
                                 }
-                            }
-                            else
-                            {
-                                Console.WriteLine("Incorrect usage of the 'öppna' command. Use 'öppna grupp <gruppnamn>' or 'öppna länk <index>'.");
-                            }
-                            break;
+                                break;
 
-                        default:
-                            Console.WriteLine("Invalid command. Type 'hjälp' for assistance.");
-                            break;
+                            default:
+                                Console.WriteLine("Invalid command. Type 'hjälp' for assistance.");
+                                break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"An error occurred: {ex.Message}");
                     }
                 }
             } while (true);
